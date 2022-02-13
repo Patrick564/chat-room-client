@@ -2,39 +2,44 @@ import { useState, useEffect } from 'react'
 import MessageList from './MessageList.js'
 
 import socket from '../../socket/socket.js'
+import UsersConnected from './UsersConnected.js'
+import Rooms from './Rooms.js'
+import UserInfo from './UserInfo.js'
+import styled from 'styled-components'
+import TopBtns from './TopBtns.js'
 
-const ChatRoom = () => {
-  const [user, setUser] = useState({})
-
-  const handleSendMsg = (e) => {
-    e.preventDefault()
-
-    socket.emit(
-      'send-message',
-      e.target.input.value
-    )
+const Wrapper = styled.div`
+  display: grid;
+  grid-template-columns: 1fr 2fr 1fr;
+  grid-template-rows: 5rem 1fr 1fr;
+  position: static;
+  
+  @media (max-width: 1024px) and (min-width: 426px) {
+    display: flex;
+    flex-direction: column;
+    margin: 0 3rem;
   }
 
-  // socket.on('user-info', (userData) => {
-  //   setUser({ username: userData.username, uuid: userData.uuid })
-  // })
+  @media (max-width: 425px) and (min-width: 320px) {
+    display: flex;
+    flex-direction: column;
+  }
+`
 
-  useEffect(() => {
-    socket.on('user-info', (userData) => {
-      setUser({ username: userData.username, uuid: userData.uuid })
-    })
-  }, [user])
+const ChatRoom = () => {
+  const [isBtnHide, setBtnHide] = useState({ rooms: true, users: true })
+  console.log(isBtnHide)
 
   return (
-    <div className="App">
-      <span>{user.username} -> {user.uuid}</span>
+    <Wrapper>
+      <TopBtns handleBtnsHide={setBtnHide} btnStatus={isBtnHide} />
+
+      <Rooms isVisible={isBtnHide.rooms} />
+
       <MessageList />
 
-      <form action="" onSubmit={handleSendMsg}>
-        <input id={'input'} type={'text'} />
-        <button type={'submit'}>Send</button>
-      </form>
-    </div>
+      <UsersConnected isVisible={isBtnHide.users} />
+    </Wrapper>
   )
 }
 

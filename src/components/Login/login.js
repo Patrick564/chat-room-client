@@ -12,6 +12,7 @@ const Login = () => {
 
   const handleSubmit = () => {
     socket.emit('user-connected', user)
+    socket.emit('join-room', 'general')
   }
 
   return (
