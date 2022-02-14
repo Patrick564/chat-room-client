@@ -4,6 +4,8 @@ import styled from 'styled-components'
 
 import Container from '../Container.js'
 import Messages from '../Messages.js'
+import Input from '../Input.js'
+import { Route, Navigate } from 'react-router-dom'
 
 const Form = styled.form`
   display: flex;
@@ -22,16 +24,6 @@ const SendBtn = styled.button`
   font-size: 1rem;
 `
 
-const Input = styled.input`
-  width: 100%;
-  padding: 0.8rem;
-  border: 2px solid #0ea5e9;
-  border-radius: 15px;
-  outline: none;
-  color: white;
-  background-color: #334155;
-`
-
 const Msg = styled.li`
   border: 1px solid #1d4ed8;
   padding: 10px 15px;
@@ -45,14 +37,17 @@ const Msg = styled.li`
 
 const MessageList = () => {
   const [messages, setMessages] = useState([])
-  const [user, setUser] = useState({})
+  const [user, setUser] = useState({ username: '', id: '' })
 
   useEffect(() => {
     socket.on('message', ({ msg, user }) => {
       setMessages((prevArr) => [...prevArr, { sender: user, content: msg }])
     })
 
+    socket.emit('send-user')
+
     socket.on('user-info', ({ id, username }) => {
+      console.info('user info')
       setUser({ username, id })
     })
   }, [])
@@ -67,6 +62,12 @@ const MessageList = () => {
 
     e.target.reset()
   }
+
+  // if (!user.username) {
+  //   return (
+  //     <Navigate to="/" replace />
+  //   )
+  // }
 
   return (
     <Container>

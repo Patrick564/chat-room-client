@@ -3,22 +3,23 @@ import styled from 'styled-components'
 const Room = styled.div`
   grid-row: 2;
   border: 1px solid black;
-  margin: 2rem;
+  margin: 1rem;
   border-radius: 15px;
-  padding: 2rem;
+  padding: 1rem 1.5rem 1.5rem 1.5rem;
   justify-self: start;
   box-shadow: 0 0 3px #0f172a;
-  background: #334155;
+  background: #18181b;
   color: white;
-  visibility: ${props => props?.visible ? 'visible' : 'hidden'};
 
   @media (max-width: 1024px) and (min-width: 426px) {
     position: absolute;
     left: 0;
     //left: 0;
     //top: 0;
-    margin-left: 10rem;
-    margin-top: 5rem;
+    margin-left: 8rem;
+    margin-top: 1rem;
+    visibility: ${props => props?.visible ? 'visible' : 'hidden'};
+    border-radius: 5px 15px 15px 15px;
     //margin-top: 5rem;
     //margin-right: 10rem;
   }
@@ -28,8 +29,10 @@ const Room = styled.div`
     right: 0;
     //left: 0;
     //top: 0;
-    margin-right: 5rem;
-    margin-top: 5rem;
+    margin-right: 7rem;
+    margin-top: 1rem;
+    visibility: ${props => props?.visible ? 'visible' : 'hidden'};
+    border-radius: 5px 15px 15px 15px;
     //margin-top: 5rem;
     //margin-right: 10rem;
   }

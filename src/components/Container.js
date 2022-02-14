@@ -12,7 +12,7 @@ const Container = styled.div`
 
   height: 700px;
   border: 1px solid black;
-  margin: 2rem;
+  margin: 1rem;
   padding: 1.5rem;
   border-radius: 15px;
   box-shadow: 0 0 3px #0f172a;
