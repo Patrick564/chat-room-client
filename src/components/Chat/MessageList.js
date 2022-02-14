@@ -1,97 +1,90 @@
-import socket from '../../socket/socket.js'
 import { useEffect, useState } from 'react'
-import styled from 'styled-components'
+import { useNavigate } from 'react-router-dom'
 
 import Container from '../Container.js'
-import Messages from '../Messages.js'
 import Input from '../Input.js'
-import { Route, Navigate } from 'react-router-dom'
+import Message from '../Message.js'
+import Messages from '../Messages.js'
+import SendBtn from '../SendBtn.js'
+import SendMessageForm from './SendMessageForm.js'
 
-const Form = styled.form`
-  display: flex;
-  margin-top: 10px;
-  gap: 15px;
-`
-
-const SendBtn = styled.button`
-  border: 2px solid #00E047;
-  background: #00E047;
-  border-radius: 15px;
-  outline: red;
-  color: white;
-  padding: 0 15px;
-  font-weight: 700;
-  font-size: 1rem;
-`
-
-const Msg = styled.li`
-  border: 1px solid #1d4ed8;
-  padding: 10px 15px;
-  border-radius: 15px 15px ${props => props?.alignDir ? '5px' : '15px'} ${props => props?.alignDir ? '15px' : '5px'};
-  background: #2563eb;
-  color: white;
-  max-width: 400px;
-  text-align: ${props => props?.alignDir ? 'right' : 'left'};
-  align-self: ${props => props?.alignDir ? 'flex-end' : 'flex-start'};
-`
+import socket from '../../socket/socket.js'
 
 const MessageList = () => {
+  const navigate = useNavigate()
   const [messages, setMessages] = useState([])
   const [user, setUser] = useState({ username: '', id: '' })
-
-  useEffect(() => {
-    socket.on('message', ({ msg, user }) => {
-      setMessages((prevArr) => [...prevArr, { sender: user, content: msg }])
-    })
-
-    socket.emit('send-user')
-
-    socket.on('user-info', ({ id, username }) => {
-      console.info('user info')
-      setUser({ username, id })
-    })
-  }, [])
 
   const handleSendMsg = (e) => {
     e.preventDefault()
 
-    socket.emit(
-      'send-message',
-      e.target.input.value
-    )
+    if (!e.target.input.value) { return }
+
+    socket.emit('send-message', e.target.input.value)
 
     e.target.reset()
   }
 
-  // if (!user.username) {
-  //   return (
-  //     <Navigate to="/" replace />
-  //   )
-  // }
+  const handleScrollMessages = () => {
+    let messagesList = document.getElementById('scrollMessages')
+
+    messagesList.scrollTop = messagesList.scrollHeight
+  }
+
+  useEffect(() => {
+    const getCurrentUser = ({ username, id }) => {
+      if (!username && !id) {
+        navigate('/')
+      }
+
+      setUser({ username, id })
+    }
+
+    const getNewMessages = ({ user, message }) => {
+      setMessages(
+        (prevArr) => [...prevArr, { sender: user, content: message }]
+      )
+      handleScrollMessages()
+    }
+
+    if (!user.username) {
+      socket.emit('get-user')
+    }
+
+    socket.on('send-user', getCurrentUser)
+    socket.on('message', getNewMessages)
+
+    return () => {
+      socket.off('message', getNewMessages)
+      socket.off('send-user', getCurrentUser)
+    }
+  }, [])
 
   return (
     <Container>
-      <Messages>
-        {messages?.map((message, id) => {
-          let content = message.sender.username === user.username ? message.content : `${message.sender.username}: ${message.content}`
+      <div id={'scrollMessages'} style={{ overflowY: 'scroll', overflowX: 'hidden' }}>
+        <Messages>
+          {messages?.map((message, id) => {
+            let content = message.sender.username === user.username ?
+              message.content :
+              `${message.sender.username}: ${message.content}`
 
-          return (
-            <Msg
-              alignDir={message.sender.username === user.username}
-              key={id}
-            >
-              <span>
+            return (
+              <Message
+                alignDir={message.sender.username === user.username}
+                key={id}
+              >
                 {content}
-              </span>
-            </Msg>
-          )
-        })}
-      </Messages>
+              </Message>
+            )
+          })}
+        </Messages>
+      </div>
 
-      <Form id={'sendMsg'} action="" onSubmit={handleSendMsg}>
+      <SendMessageForm id={'sendMsg'} action="" onSubmit={handleSendMsg}>
         <Input id={'input'} type={'text'} />
         <SendBtn type={'submit'}>Send</SendBtn>
-      </Form>
+      </SendMessageForm>
     </Container>
   )
 }

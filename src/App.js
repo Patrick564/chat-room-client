@@ -1,6 +1,6 @@
 import { Routes, Route } from 'react-router-dom'
 
-import ChatRoom from './components/Chat/ChatRoom.js'
+import Chat from './routes/Chat.js'
 import Login from './components/Login/login.js'
 
 import './App.css'
@@ -10,7 +10,7 @@ function App() {
     <Routes>
       <Route exact path={'/'} element={<Login />} />
 
-      <Route path={'/chat'} element={<ChatRoom />} />
+      <Route path={'/chat'} element={<Chat />} />
     </Routes>
   )
 }
