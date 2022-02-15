@@ -9,6 +9,18 @@ import SendBtn from '../SendBtn.js'
 import SendMessageForm from './SendMessageForm.js'
 
 import socket from '../../socket/socket.js'
+import styled from 'styled-components'
+
+const ContentMsg = styled.span`
+  display: block;
+  max-width: 390px;
+  word-wrap: break-word;
+`
+
+const TimeMsg = styled.span`
+  font-weight: lighter;
+  font-size: x-small;
+`
 
 const MessageList = () => {
   const navigate = useNavigate()
@@ -18,7 +30,9 @@ const MessageList = () => {
   const handleSendMsg = (e) => {
     e.preventDefault()
 
-    if (!e.target.input.value) { return }
+    if (!e.target.input.value) {
+      return
+    }
 
     socket.emit('send-message', e.target.input.value)
 
@@ -40,9 +54,9 @@ const MessageList = () => {
       setUser({ username, id })
     }
 
-    const getNewMessages = ({ user, message }) => {
+    const getNewMessages = ({ user, message, sendTime }) => {
       setMessages(
-        (prevArr) => [...prevArr, { sender: user, content: message }]
+        (prevArr) => [...prevArr, { sender: user, content: message, time: sendTime }]
       )
       handleScrollMessages()
     }
@@ -55,10 +69,12 @@ const MessageList = () => {
     socket.on('message', getNewMessages)
 
     return () => {
-      socket.off('message', getNewMessages)
       socket.off('send-user', getCurrentUser)
+      socket.off('message', getNewMessages)
     }
   }, [])
+
+  console.log(messages)
 
   return (
     <Container>
@@ -74,7 +90,12 @@ const MessageList = () => {
                 alignDir={message.sender.username === user.username}
                 key={id}
               >
-                {content}
+                <ContentMsg>
+                  {content}
+                </ContentMsg>
+                <TimeMsg>
+                  {message.time}
+                </TimeMsg>
               </Message>
             )
           })}

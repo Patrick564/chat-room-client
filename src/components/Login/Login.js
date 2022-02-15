@@ -1,4 +1,4 @@
-import { Link } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 import { useState } from 'react'
 
 import socket from '../../socket/socket.js'
@@ -7,7 +7,7 @@ import Wrapper from '../Wrapper.js'
 
 import Input from '../Input.js'
 
-const LoginCard = styled.div`
+const LoginCard = styled.form`
   grid-column: 2;
   grid-row: 2;
   display: flex;
@@ -25,14 +25,21 @@ const LoginCard = styled.div`
     align-self: center;
     margin-top: 6rem;
   }
+
+  @media (max-width: 425px) and (min-width: 320px) {
+    align-self: center;
+    margin-top: 6rem;
+  }
 `
 
-const StyledLink = styled(Link)`
+const StyledButton = styled.button`
   color: white;
-  text-decoration: none;
-  border-top: 1px solid black;
   padding-top: 15px;
   text-align: center;
+  border: none;
+  background: none;
+  border-top: 1px solid black;
+  cursor: pointer;
 `
 
 const LoginInput = styled(Input)`
@@ -40,22 +47,29 @@ const LoginInput = styled(Input)`
 `
 
 const Login = () => {
+  const navigate = useNavigate()
   const [user, setUser] = useState('')
 
   const handleInput = (e) => {
     setUser(e.target.value)
   }
 
-  const handleSubmit = () => {
+  const handleSubmit = (e) => {
+    e.preventDefault()
+
+    if (e.target.username.value === '') { return }
+
     socket.emit('user-connected', user)
     socket.emit('join-room', 'general')
+
+    navigate('/chat')
   }
 
   return (
     <Wrapper>
-      <LoginCard>
-        <LoginInput type="text" onChange={handleInput} />
-        <StyledLink to={'/chat'} onClick={handleSubmit}>Got to chat</StyledLink>
+      <LoginCard onSubmit={handleSubmit}>
+        <LoginInput id={'username'} type="text" onChange={handleInput} />
+        <StyledButton type={'submit'}>Got to chat</StyledButton>
       </LoginCard>
     </Wrapper>
   )
